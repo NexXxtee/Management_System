@@ -1,13 +1,13 @@
 from django.contrib import admin
-from users.models import User, Position
+from users.models import CustomUser
+from django.contrib.auth.admin import UserAdmin
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ["name", "email", "date_created"]
-    list_display_links = ["name"]
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    list_display = ("username", "email", "role", "is_active", "is_staff", "date_created")
+    search_fields = ("username", "email")
+    list_filter = ("role", "is_active", "is_staff")
     
-    
-@admin.register(Position)
-class PositionAdmin(admin.ModelAdmin):
-    list_display = ["name", "salary"]
+    admin.site.site_header = "Администрирование пользователей"
+    admin.site.site_title = "Управление пользователями"
