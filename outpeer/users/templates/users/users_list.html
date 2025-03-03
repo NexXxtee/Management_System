@@ -1,0 +1,33 @@
+<h2>Список пользователей</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Email</th>
+        <th>Роль</th>
+    </tr>
+    {% for user in page_obj %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Пагинация -->
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page=1">Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+    {% endif %}
+
+    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперед</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+    {% endif %}
+</div>

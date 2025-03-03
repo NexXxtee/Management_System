@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import UserRegistrationForm, RegistrationForm
 from .models import CustomUser
 import random
@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import EmailConfirmationCode
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 def register(request):
     if request.method == "POST":
@@ -93,3 +94,15 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect("login")  # После выхода перенаправляем на страницу входа
+
+
+User = get_user_model()  # Получаем кастомную модель пользователя
+
+def users_list(request):
+    users = User.objects.all()
+    paginator = Paginator(users, 5)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "users/users_list.html", {"page_obj": page_obj})
