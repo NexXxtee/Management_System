@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Список пользователей</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Имя пользователя</th>
+        <th>Email</th>
+        <th>Роль</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in page_users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.get_role_display }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3">Пользователи не найдены</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Пагинация -->
+  <div class="pagination">
+    {% if page_users.has_previous %}
+      <a href="?page=1">Первая</a>
+      <a href="?page={{ page_users.previous_page_number }}">Назад</a>
+    {% endif %}
+
+    <span>Страница {{ page_users.number }} из {{ page_users.paginator.num_pages }}</span>
+
+    {% if page_users.has_next %}
+      <a href="?page={{ page_users.next_page_number }}">Вперед</a>
+      <a href="?page={{ page_users.paginator.num_pages }}">Последняя</a>
+    {% endif %}
+  </div>
+{% endblock %}

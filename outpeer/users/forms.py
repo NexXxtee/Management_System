@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from outpeer.users.models import CustomUser
+from .models import CustomUser
 
 
 class UserCreationForm(UserCreationForm):
