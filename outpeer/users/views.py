@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from .forms import UserCreationForm
 from django.core.paginator import Paginator
 from .models import CustomUser
-
+from django.contrib.auth import logout
 
 def index(request):
     return render(request, 'users/index.html')
@@ -18,7 +18,9 @@ def user_list(request):
 
     return render(request, "users/user_list.html", {"page_users": page_users})
     
-    
+def custom_logout(request):
+    logout(request)
+    return redirect("login")  
     
 class RegisterView(View):
     def get(self, request):
