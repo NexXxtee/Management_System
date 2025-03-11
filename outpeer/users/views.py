@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.core.mail import send_mail
 from django.views import View
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm
 from django.core.paginator import Paginator
-from .models import CustomUser
+from .models import CustomUser, EmailVerification
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 
@@ -29,10 +30,40 @@ class RegisterView(View):
     def post(self, request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)  # Автоматически входим после регистрации
-            return redirect("login")  # Перенаправляем на страницу входа
+            user = form.save(commit=False)
+            user.is_active = False  # Деактивируем пользователя до подтверждения email
+            user.save()
+            
+            # Создаём код подтверждения
+            verification = EmailVerification.objects.create(user=user)
+            send_mail(
+                "Подтверждение регистрации",
+                f"Ваш код подтверждения: {verification.code}",
+                "noreply@outpeer.com",
+                [user.email],
+                fail_silently=False,
+            )
+            return redirect("verify_email", user_id=user.id) 
         return render(request, "users/registration.html", {"form": form})
+
+
+class VerifyEmailView(View):
+    def get(self, request, user_id):
+        return render(request, "users/verify_email.html", {"user_id": user_id})
+
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        code = request.POST.get("code")
+        
+        verification = get_object_or_404(EmailVerification, user=user, code=code)
+        if verification:
+            user.is_active = True  # Активируем пользователя
+            user.save()
+            verification.delete()  # Удаляем использованный код
+            login(request, user)  # Логиним пользователя
+            return redirect("home")
+
+        return render(request, "users/verify_email.html", {"user_id": user_id, "error": "Неверный код"})
 
 
 class CustomLogoutView(View):

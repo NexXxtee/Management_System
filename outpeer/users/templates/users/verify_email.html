@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Подтвердите Email</h2>
+  <p>Введите код, который был отправлен вам на почту.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="code" placeholder="Код подтверждения" required>
+    <button type="submit">Подтвердить</button>
+  </form>
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+{% endblock %}
